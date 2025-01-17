@@ -6,6 +6,7 @@ import subprocess
 import openpyxl
 import argparse
 import logging
+import sys
 from openpyxl import Workbook
 
 # Configure logging
@@ -40,6 +41,15 @@ def get_binaries_list(directory):
                 binaries_list.append(os.path.join(root, file))
     return binaries_list
 
+def check_tf_command():
+    """Check if the tf command is available."""
+    try:
+        subprocess.run(['tf', 'help'], capture_output=True, text=True, shell=True, check=True)
+        logging.info("TFS command-line tool is available.")
+    except subprocess.CalledProcessError:
+        logging.error("TFS command-line tool is not available. Please ensure it is installed and included in your PATH.")
+        sys.exit(1)
+
 # Function to get the list of files from TFS
 def get_tfs_files_list(tfs_url, tfs_project, username, pat):
     """Get the list of files from TFS."""
@@ -70,6 +80,8 @@ def main():
     parser.add_argument('--username', required=True, help="TFS username")
     parser.add_argument('--pat', required=True, help="TFS Personal Access Token")
     args = parser.parse_args()
+
+    check_tf_command()
 
     logging.info("Starting to get binaries list from TFS...")
     tfs_binaries_list = get_tfs_binaries_list(args.tfs_url, args.tfs_project, args.username, args.pat)
