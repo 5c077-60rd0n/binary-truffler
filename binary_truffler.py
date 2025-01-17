@@ -48,6 +48,10 @@ def check_tf_command():
         logging.info("TFS command-line tool is available.")
     except subprocess.CalledProcessError:
         logging.error("TFS command-line tool is not available. Please ensure it is installed and included in your PATH.")
+        logging.info("Installation instructions:")
+        logging.info("Windows: Install Visual Studio with the 'Azure DevOps Server' workload.")
+        logging.info("macOS: Install Homebrew and run 'brew install tfs'.")
+        logging.info("Ubuntu: Install .NET Core SDK and download the TFS cross-platform command-line tool from the official GitHub repository.")
         sys.exit(1)
 
 # Function to get the list of files from TFS
