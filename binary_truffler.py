@@ -68,10 +68,22 @@ def get_binaries_list(directory):
                 binaries_list.append(os.path.join(root, file))
     return binaries_list
 
+def create_spreadsheet(binaries_list, output_path):
+    """Create a spreadsheet listing all binaries."""
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Binaries List"
+    ws.append(["Binary File Path"])
+    for binary in binaries_list:
+        ws.append([binary])
+    wb.save(output_path)
+    logging.info(f"Spreadsheet saved to {output_path}")
+
 def main():
     parser = argparse.ArgumentParser(description="Unzip a repository and list all binaries.")
     parser.add_argument('--zip_path', required=True, help="Path to the zip file of the repository")
     parser.add_argument('--extract_to', required=True, help="Directory to extract the repository to")
+    parser.add_argument('--output_path', required=True, help="Path to save the output spreadsheet")
     args = parser.parse_args()
 
     unzip_repo(args.zip_path, args.extract_to)
@@ -79,6 +91,8 @@ def main():
     logging.info("Starting to get binaries list from the extracted repository...")
     binaries_list = get_binaries_list(args.extract_to)
     logging.info(f"Found {len(binaries_list)} binaries in the extracted repository")
+
+    create_spreadsheet(binaries_list, args.output_path)
 
 if __name__ == "__main__":
     main()

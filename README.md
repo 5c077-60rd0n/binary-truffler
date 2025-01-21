@@ -16,15 +16,15 @@ pip install openpyxl
 
 To run the script, use the following command:
 ```sh
-python binary_truffler.py --zip_path <ZIP_PATH> --extract_to <EXTRACT_TO>
+python binary_truffler.py --zip_path <ZIP_PATH> --extract_to <EXTRACT_TO> --output_path <OUTPUT_PATH>
 ```
 
 ### Example
 ```sh
-python binary_truffler.py --zip_path path/to/repo.zip --extract_to path/to/extract
+python binary_truffler.py --zip_path path/to/repo.zip --extract_to path/to/extract --output_path path/to/output.xlsx
 ```
 
-Replace `<ZIP_PATH>` and `<EXTRACT_TO>` with the path to your zip file and the directory to extract the repository to, respectively.
+Replace `<ZIP_PATH>`, `<EXTRACT_TO>`, and `<OUTPUT_PATH>` with the path to your zip file, the directory to extract the repository to, and the path to save the output spreadsheet, respectively.
 
 ## Logging
 
@@ -43,3 +43,6 @@ Returns a list of all directories in the specified directory.
 
 ### `get_binaries_list(directory)`
 Returns a list of all binaries in the specified directory.
+
+### `create_spreadsheet(binaries_list, output_path)`
+Creates a spreadsheet listing all binaries and saves it to the specified path.
