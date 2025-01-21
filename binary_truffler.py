@@ -3,13 +3,35 @@
 
 import os
 import zipfile
-import openpyxl
 import argparse
 import logging
-from openpyxl import Workbook
+import sys
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+def install_openpyxl():
+    """Install openpyxl if it is not already installed."""
+    try:
+        import openpyxl
+    except ImportError:
+        logging.info("openpyxl not found. Attempting to install...")
+        try:
+            import pip
+            pip.main(['install', 'openpyxl'])
+            import openpyxl
+            logging.info("Successfully installed openpyxl.")
+        except Exception as e:
+            logging.error(f"Failed to install openpyxl: {e}")
+            logging.info("Please ensure you have access to the internet or configure pip to use a proxy.")
+            logging.info("To configure pip to use a proxy, set the HTTP_PROXY and HTTPS_PROXY environment variables.")
+            logging.info("Example:")
+            logging.info("export HTTP_PROXY=http://proxy.example.com:8080")
+            logging.info("export HTTPS_PROXY=http://proxy.example.com:8080")
+            sys.exit(1)
+
+install_openpyxl()
+from openpyxl import Workbook
 
 def unzip_repo(zip_path, extract_to):
     """Unzip the repository to the specified directory."""
