@@ -1,4 +1,4 @@
-tparam (
+param (
     [string]$username,
     [string]$pat,
     [string]$tfsUrl,
@@ -19,17 +19,6 @@ $securePat = ConvertTo-SecureString $pat -AsPlainText -Force
 $credential = New-Object System.Management.Automation.PSCredential ($username, $securePat)
 $connection = Connect-AzAccount -Credential $credential -ServicePrincipal -Tenant $tfsUrl
 
-# Download the repository
-$repoPath = "$env:TEMP\$repo"
-if (Test-Path $repoPath) {
-    Remove-Item -Recurse -Force $repoPath
-}
-New-Item -ItemType Directory -Path $repoPath
-
-Write-Host "Downloading repository..."
-$repository = Get-AzDevOpsRepository -ProjectName $project -RepositoryName $repo
-$repository | Get-AzDevOpsRepositoryContent -DestinationPath $repoPath
-
 # Function to determine if a file is binary
 function Is-BinaryFile {
     param (
@@ -47,12 +36,17 @@ function Is-BinaryFile {
 # Get list of binaries
 Write-Host "Getting list of binaries..."
 $binariesList = @()
-Get-ChildItem -Path $repoPath -Recurse -File | ForEach-Object {
-    if (Is-BinaryFile -filePath $_.FullName) {
-        $binariesList += [PSCustomObject]@{
-            FilePath = $_.FullName
-            FileSize = $_.Length
-            Ignored  = $false # Implement logic to check if the file is ignored
+$repositoryItems = Get-AzDevOpsRepositoryItem -ProjectName $project -RepositoryName $repo -Path "/"
+foreach ($item in $repositoryItems) {
+    if ($item.IsFolder -eq $false) {
+        $filePath = $item.Path
+        $fileContent = Get-AzDevOpsRepositoryItemContent -ProjectName $project -RepositoryName $repo -Path $filePath
+        if (Is-BinaryFile -filePath $fileContent) {
+            $binariesList += [PSCustomObject]@{
+                FilePath = $filePath
+                FileSize = $item.Size
+                Ignored  = $false # Implement logic to check if the file is ignored
+            }
         }
     }
 }
@@ -82,7 +76,4 @@ $excel.Quit()
 
 Write-Host "Spreadsheet saved to $outputPath"
 
-# Clean up
-Write-Host "Cleaning up..."
-Remove-Item -Recurse -Force $repoPath
 Write-Host "Done."
