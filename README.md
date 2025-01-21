@@ -53,3 +53,42 @@ Returns a list of all binaries in the specified directory.
 
 ### `create_spreadsheet(binaries_list, output_path)`
 Creates a spreadsheet listing all binaries and saves it to the specified path.
+
+## PowerShell Script
+
+`tfs_truffler.ps1` is a PowerShell script that authenticates a user with TFS using a username and PAT, downloads the repository, and lists all binaries in a spreadsheet.
+
+### Requirements
+
+- PowerShell 5.1 or later
+- `Az.DevOps` module
+
+You can install the required module using the following command:
+```powershell
+Install-Module -Name Az.DevOps -Scope CurrentUser -Force
+```
+
+### Usage
+
+To run the script, use the following command:
+```powershell
+.\tfs_truffler.ps1 -username <USERNAME> -pat <PAT> -tfsUrl <TFS_URL> -project <PROJECT> -repo <REPO> -outputPath <OUTPUT_PATH>
+```
+
+### Example
+```powershell
+.\tfs_truffler.ps1 -username "user@example.com" -pat "yourPAT" -tfsUrl "https://dev.azure.com/yourorganization" -project "YourProject" -repo "YourRepo" -outputPath "C:\path\to\output.xlsx"
+```
+
+Replace `<USERNAME>`, `<PAT>`, `<TFS_URL>`, `<PROJECT>`, `<REPO>`, and `<OUTPUT_PATH>` with your TFS username, personal access token, TFS URL, project name, repository name, and the path to save the output spreadsheet, respectively.
+
+### Logging
+
+The script provides feedback on its progress and any issues encountered through console output.
+
+### Spreadsheet Format
+
+The output spreadsheet will be in `.xlsx` format and will contain the following columns:
+- **File Path**: The path to the binary file.
+- **File Size**: The size of the binary file in bytes.
+- **Ignored**: Whether the file is ignored by `.gitignore`, `.tfignore`, or `.tfattributes`.
