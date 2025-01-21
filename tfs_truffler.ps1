@@ -8,11 +8,11 @@ param (
 )
 
 # Install required modules
-if (-not (Get-Module -ListAvailable -Name Az.DevOps)) {
-    Install-Module -Name Az.DevOps -Scope CurrentUser -Force
+if (-not (Get-Module -ListAvailable -Name AzureDevOps)) {
+    Install-Module -Name AzureDevOps -Scope CurrentUser -Force
 }
 
-Import-Module Az.DevOps
+Import-Module AzureDevOps
 
 # Authenticate with TFS
 $securePat = ConvertTo-SecureString $pat -AsPlainText -Force
