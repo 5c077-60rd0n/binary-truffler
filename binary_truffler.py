@@ -38,7 +38,11 @@ from openpyxl import Workbook
 def unzip_repo(zip_path, extract_to):
     """Unzip the repository to the specified directory."""
     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-        zip_ref.extractall(extract_to)
+        total_files = len(zip_ref.infolist())
+        for i, file in enumerate(zip_ref.infolist(), start=1):
+            zip_ref.extract(file, extract_to)
+            if i % 100 == 0 or i == total_files:
+                logging.info(f"Unzipped {i}/{total_files} files")
     logging.info(f"Unzipped repository to {extract_to}")
 
 # Function to get the list of files in a directory
