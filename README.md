@@ -30,6 +30,13 @@ Replace `<ZIP_PATH>`, `<EXTRACT_TO>`, and `<OUTPUT_PATH>` with the path to your 
 
 The script uses logging to provide feedback on its progress and any issues encountered. Logs are printed to the console with timestamps and log levels.
 
+## Spreadsheet Format
+
+The output spreadsheet will be in `.xlsx` format and will contain the following columns:
+- **File Path**: The path to the binary file.
+- **File Size**: The size of the binary file in bytes.
+- **Ignored**: Whether the file is ignored by `.gitignore`, `.tfignore`, or `.tfattributes`.
+
 ## Functions
 
 ### `unzip_repo(zip_path, extract_to)`

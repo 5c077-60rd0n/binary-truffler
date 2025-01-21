@@ -6,6 +6,7 @@ import zipfile
 import argparse
 import logging
 import sys
+import concurrent.futures
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -61,10 +62,9 @@ def get_directories_list(directory):
 def get_binaries_list(directory):
     """Get the list of binaries in a directory."""
     binaries_list = []
-    binary_extensions = ('.dll', '.exe', '.pdb', '.lib', '.obj', '.bin', '.so', '.a', '.dylib', '.o', '.out', '.class', '.jar', '.war', '.ear')
     for root, _, files in os.walk(directory):
         for file in files:
-            if file.endswith(binary_extensions):
+            if is_binary(file):
                 binaries_list.append(os.path.join(root, file))
     return binaries_list
 
@@ -73,11 +73,21 @@ def create_spreadsheet(binaries_list, output_path):
     wb = Workbook()
     ws = wb.active
     ws.title = "Binaries List"
-    ws.append(["Binary File Path"])
+    ws.append(["File Path", "File Size", "Ignored"])
     for binary in binaries_list:
-        ws.append([binary])
+        file_size = os.path.getsize(binary)
+        ignored = is_ignored(binary)
+        ws.append([binary, file_size, ignored])
     wb.save(output_path)
     logging.info(f"Spreadsheet saved to {output_path}")
+
+def is_binary(file_path):
+    # Implement logic to determine if a file is binary
+    pass
+
+def is_ignored(file_path):
+    # Implement logic to determine if a file is ignored
+    pass
 
 def main():
     parser = argparse.ArgumentParser(description="Unzip a repository and list all binaries.")
