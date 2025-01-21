@@ -7,6 +7,7 @@ import argparse
 import logging
 import sys
 import concurrent.futures
+import shutil
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -89,6 +90,11 @@ def is_ignored(file_path):
     # Implement logic to determine if a file is ignored
     pass
 
+def clean_up(directory):
+    """Remove the extracted files and directories."""
+    shutil.rmtree(directory)
+    logging.info(f"Cleaned up extracted files from {directory}")
+
 def main():
     parser = argparse.ArgumentParser(description="Unzip a repository and list all binaries.")
     parser.add_argument('--zip_path', required=True, help="Path to the zip file of the repository")
@@ -103,6 +109,8 @@ def main():
     logging.info(f"Found {len(binaries_list)} binaries in the extracted repository")
 
     create_spreadsheet(binaries_list, args.output_path)
+
+    clean_up(args.extract_to)
 
 if __name__ == "__main__":
     main()
