@@ -35,42 +35,50 @@ def install_openpyxl():
 install_openpyxl()
 from openpyxl import Workbook
 
+def unzip_file(zip_ref, file, extract_to):
+    zip_ref.extract(file, extract_to)
+
 def unzip_repo(zip_path, extract_to):
     """Unzip the repository to the specified directory."""
     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
         total_files = len(zip_ref.infolist())
-        for i, file in enumerate(zip_ref.infolist(), start=1):
-            zip_ref.extract(file, extract_to)
-            if i % 100 == 0 or i == total_files:
-                logging.info(f"Unzipped {i}/{total_files} files")
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            futures = [executor.submit(unzip_file, zip_ref, file, extract_to) for file in zip_ref.infolist()]
+            for i, future in enumerate(concurrent.futures.as_completed(futures), start=1):
+                if i % 100 == 0 or i == total_files:
+                    logging.info(f"Unzipped {i}/{total_files} files")
     logging.info(f"Unzipped repository to {extract_to}")
 
 # Function to get the list of files in a directory
 def get_files_list(directory):
     """Get the list of files in a directory."""
     files_list = []
-    for root, _, files in os.walk(directory):
-        for file in files:
-            files_list.append(os.path.join(root, file))
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        for root, _, files in os.walk(directory):
+            futures = [executor.submit(os.path.join, root, file) for file in files]
+            files_list.extend([future.result() for future in concurrent.futures.as_completed(futures)])
     return files_list
 
 # Function to get the list of directories in a directory
 def get_directories_list(directory):
     """Get the list of directories in a directory."""
     directories_list = []
-    for root, directories, _ in os.walk(directory):
-        for directory in directories:
-            directories_list.append(os.path.join(root, directory))
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        for root, directories, _ in os.walk(directory):
+            futures = [executor.submit(os.path.join, root, directory) for directory in directories]
+            directories_list.extend([future.result() for future in concurrent.futures.as_completed(futures)])
     return directories_list
 
 # Function to get the list of binaries in a directory
 def get_binaries_list(directory):
     """Get the list of binaries in a directory."""
     binaries_list = []
-    for root, _, files in os.walk(directory):
-        for file in files:
-            if is_binary(file):
-                binaries_list.append(os.path.join(root, file))
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        for root, _, files in os.walk(directory):
+            futures = [executor.submit(is_binary, os.path.join(root, file)) for file in files]
+            for future in concurrent.futures.as_completed(futures):
+                if future.result():
+                    binaries_list.append(future.result())
     return binaries_list
 
 def create_spreadsheet(binaries_list, output_path):
