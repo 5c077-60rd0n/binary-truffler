@@ -13,20 +13,11 @@ if (-not (Get-PSRepository -Name "PSGallery" -ErrorAction SilentlyContinue)) {
 }
 
 # Install required modules
-if (-not (Get-Module -ListAvailable -Name Az)) {
-    Install-Module -Name Az -Scope CurrentUser -Force -AllowClobber
-}
 if (-not (Get-Module -ListAvailable -Name AzureDevOps)) {
     Install-Module -Name AzureDevOps -Scope CurrentUser -Force
 }
 
-Import-Module Az
 Import-Module AzureDevOps
-
-# Authenticate with Azure
-$securePat = ConvertTo-SecureString $pat -AsPlainText -Force
-$credential = New-Object System.Management.Automation.PSCredential ($username, $securePat)
-Connect-AzAccount -Credential $credential
 
 # Authenticate with Azure DevOps
 $connection = Connect-AzDevOps -Organization $tfsUrl -PersonalAccessToken $pat
