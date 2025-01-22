@@ -13,15 +13,23 @@ if (-not (Get-PSRepository -Name "PSGallery" -ErrorAction SilentlyContinue)) {
 }
 
 # Install required modules
+if (-not (Get-Module -ListAvailable -Name Az)) {
+    Install-Module -Name Az -Scope CurrentUser -Force
+}
 if (-not (Get-Module -ListAvailable -Name AzureDevOps)) {
     Install-Module -Name AzureDevOps -Scope CurrentUser -Force
 }
 
+Import-Module Az
 Import-Module AzureDevOps
 
-# Authenticate with Azure DevOps
+# Authenticate with Azure
 $securePat = ConvertTo-SecureString $pat -AsPlainText -Force
-$connection = Connect-AzDevOpsService -OrganizationUrl $tfsUrl -PersonalAccessToken $securePat
+$credential = New-Object System.Management.Automation.PSCredential ($username, $securePat)
+Connect-AzAccount -Credential $credential
+
+# Authenticate with Azure DevOps
+$connection = Connect-AzDevOps -Organization $tfsUrl -PersonalAccessToken $pat
 
 # Function to determine if a file is binary
 function Is-BinaryFile {
