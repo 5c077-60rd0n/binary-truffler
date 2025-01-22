@@ -14,10 +14,10 @@ if (-not (Get-PSRepository -Name "PSGallery" -ErrorAction SilentlyContinue)) {
 
 # Install required modules
 if (-not (Get-Module -ListAvailable -Name AzureDevOps)) {
-    Install-Module -Name AzureDevOps -Scope CurrentUser -Force
+    Install-Module -Name AzureDevOps -RequiredVersion 2.0.0 -Scope CurrentUser -Force
 }
 
-Import-Module AzureDevOps
+Import-Module AzureDevOps -RequiredVersion 2.0.0
 
 # Authenticate with Azure DevOps
 $personalAccessToken = ConvertTo-SecureString -String $pat -AsPlainText -Force
