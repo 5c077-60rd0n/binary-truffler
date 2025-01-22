@@ -7,6 +7,11 @@ param (
     [string]$outputPath
 )
 
+# Ensure PSGallery repository is registered
+if (-not (Get-PSRepository -Name "PSGallery" -ErrorAction SilentlyContinue)) {
+    Register-PSRepository -Name "PSGallery" -SourceLocation "https://www.powershellgallery.com/api/v2" -InstallationPolicy Trusted
+}
+
 # Install required modules
 if (-not (Get-Module -ListAvailable -Name AzureDevOps)) {
     Install-Module -Name AzureDevOps -Scope CurrentUser -Force
@@ -14,10 +19,10 @@ if (-not (Get-Module -ListAvailable -Name AzureDevOps)) {
 
 Import-Module AzureDevOps
 
-# Authenticate with TFS
+# Authenticate with Azure DevOps
 $securePat = ConvertTo-SecureString $pat -AsPlainText -Force
 $credential = New-Object System.Management.Automation.PSCredential ($username, $securePat)
-$connection = Connect-AzAccount -Credential $credential -ServicePrincipal -Tenant $tfsUrl
+$connection = Connect-AzDevOps -Organization $tfsUrl -ProjectName $project -Credential $credential
 
 # Function to determine if a file is binary
 function Is-BinaryFile {
