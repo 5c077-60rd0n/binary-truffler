@@ -20,7 +20,7 @@ if (-not (Get-Module -ListAvailable -Name AzureDevOps)) {
 Import-Module AzureDevOps
 
 # Authenticate with Azure DevOps
-Connect-AzDevOps -Organization $tfsUrl -PersonalAccessToken $pat
+$connection = Connect-AzDevOps -Organization $tfsUrl -PersonalAccessToken $pat
 
 # Function to determine if a file is binary
 function Is-BinaryFile {
