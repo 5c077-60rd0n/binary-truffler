@@ -14,7 +14,7 @@ if (-not (Get-PSRepository -Name "PSGallery" -ErrorAction SilentlyContinue)) {
 
 # Install required modules
 if (-not (Get-Module -ListAvailable -Name Az)) {
-    Install-Module -Name Az -Scope CurrentUser -Force
+    Install-Module -Name Az -Scope CurrentUser -Force -AllowClobber
 }
 if (-not (Get-Module -ListAvailable -Name AzureDevOps)) {
     Install-Module -Name AzureDevOps -Scope CurrentUser -Force
