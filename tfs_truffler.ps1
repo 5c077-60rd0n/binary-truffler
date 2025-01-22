@@ -13,26 +13,21 @@ if (-not (Get-PSRepository -Name "PSGallery" -ErrorAction SilentlyContinue)) {
 }
 
 # Install required modules
-if (-not (Get-Module -ListAvailable -Name Az)) {
-    Install-Module -Name Az -Scope CurrentUser -Force -AllowClobber
-}
 if (-not (Get-Module -ListAvailable -Name AzureDevOps)) {
     Install-Module -Name AzureDevOps -Scope CurrentUser -Force
 }
 
-Import-Module Az
 Import-Module AzureDevOps
 
 # Authenticate with Azure DevOps
-$securePat = ConvertTo-SecureString $pat -AsPlainText -Force
-$connection = Connect-AzDevOps -Organization $tfsUrl -PersonalAccessToken $pat
+Connect-AzDevOps -Organization $tfsUrl -PersonalAccessToken $pat
 
 # Function to determine if a file is binary
 function Is-BinaryFile {
     param (
         [string]$filePath
     )
-    $bytes = Get-Content -Path $filePath -Encoding Byte -ReadCount 1024
+    $bytes = [System.IO.File]::ReadAllBytes($filePath)
     foreach ($byte in $bytes) {
         if ($byte -eq 0) {
             return $true
@@ -44,8 +39,12 @@ function Is-BinaryFile {
 # Get list of binaries
 Write-Host "Getting list of binaries..."
 $binariesList = @()
-$repositoryItems = Get-AzDevOpsRepositoryItem -ProjectName $project -RepositoryName $repo -Path "/"
-foreach ($item in $repositoryItems) {
+$repositoryItems = Get-AzDevOpsRepositoryItem -ProjectName $project -RepositoryName $repo -Path "/" -Recurse
+$parallelOptions = New-Object System.Threading.Tasks.ParallelOptions
+$parallelOptions.MaxDegreeOfParallelism = [System.Environment]::ProcessorCount
+
+[System.Threading.Tasks.Parallel]::ForEach($repositoryItems, $parallelOptions, {
+    param ($item)
     if ($item.IsFolder -eq $false) {
         $filePath = $item.Path
         $fileContent = Get-AzDevOpsRepositoryItemContent -ProjectName $project -RepositoryName $repo -Path $filePath
@@ -57,7 +56,7 @@ foreach ($item in $repositoryItems) {
             }
         }
     }
-}
+})
 
 # Create spreadsheet
 Write-Host "Creating spreadsheet..."
