@@ -21,8 +21,7 @@ Import-Module AzureDevOps
 
 # Authenticate with Azure DevOps
 $securePat = ConvertTo-SecureString $pat -AsPlainText -Force
-$credential = New-Object System.Management.Automation.PSCredential ($username, $securePat)
-$connection = Connect-AzDevOps -Organization $tfsUrl -ProjectName $project -Credential $credential
+$connection = Connect-AzDevOpsService -OrganizationUrl $tfsUrl -PersonalAccessToken $securePat
 
 # Function to determine if a file is binary
 function Is-BinaryFile {
