@@ -187,6 +187,7 @@ foreach ($item in $items) {
             $rproj_count += 1
         } else {
             try {
+                Write-Host "Processing project: $($item.name)"
                 $folders = & $tfExePath dir "$/$($item.name)" /recursive
                 $global:projectname = $($item.name)
                 Get-ProjectFolderFileSize -folders $folders
@@ -205,7 +206,11 @@ foreach ($item in $items) {
     # Write-Progress -PercentComplete ($proj_count / $items.count * 100) -Status "Processed $proj_count Project of $($items.count)" -Activity "Active Project: $aproj_count`tRetired Project: $rproj_count"
 }
 
-Create-Spreadsheet -binariesList $binariesList -outputPath "C:\path\to\output.xlsx"
+# Save the spreadsheet to the current workspace directory
+$currentWorkspace = (Get-Location).Path
+$outputPath = Join-Path -Path $currentWorkspace -ChildPath "output.xlsx"
+
+Create-Spreadsheet -binariesList $binariesList -outputPath $outputPath
 
 Write-Output "Total Active Projects: $aproj_count`tTotal Retired Projects: $rproj_count" | Tee-Object -FilePath "C:\temp\TFVCProjects.txt" -Append
 Write-Output "Total Projects: $proj_count" | Tee-Object -FilePath "C:\temp\TFVCProjects.txt" -Append
