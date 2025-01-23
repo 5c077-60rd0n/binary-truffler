@@ -174,10 +174,10 @@ $excludeProj = @(
     "Project3"
 )
 
-# Replace with your TFS URL
-$tfsUrl = "https://your-tfs-url/tfs/YourCollection"
+# Replace with your TFS API URL
+$apiUrl = "https://your-tfs-url/tfs/YourCollection/_apis/projects?api-version=1.0&%24top=500"
 
-$project = Invoke-RestMethod -Uri "$tfsUrl/_apis/projects?api-version=1.0&%24top=500" -UseDefaultCredentials
+$project = Invoke-RestMethod -Uri $apiUrl -UseDefaultCredentials
 $items = $project.value | Select-Object -Property name, description | Sort-Object name
 $binariesList = @()
 foreach ($item in $items) {
@@ -186,12 +186,17 @@ foreach ($item in $items) {
             Write-Output "$($item.name)`tskipped" | Tee-Object -FilePath "C:\temp\TFVCProjects.txt" -Append
             $rproj_count += 1
         } else {
-            $folders = & $tfExePath dir "$/$($item.name)" /recursive
-            $global:projectname = $($item.name)
-            Get-ProjectFolderFileSize -folders $folders
-            $binariesList += Get-ProjectFolderBinaries -folders $folders
-            Write-Output "$($item.name)`t$($folders.count)" | Tee-Object -FilePath "C:\temp\TFVCProjects.txt" -Append
-            $aproj_count += 1
+            try {
+                $folders = & $tfExePath dir "$/$($item.name)" /recursive
+                $global:projectname = $($item.name)
+                Get-ProjectFolderFileSize -folders $folders
+                $binariesList += Get-ProjectFolderBinaries -folders $folders
+                Write-Output "$($item.name)`t$($folders.count)" | Tee-Object -FilePath "C:\temp\TFVCProjects.txt" -Append
+                $aproj_count += 1
+            } catch {
+                Write-Host "Failed to retrieve folders for project: $($item.name)" -ForegroundColor Red
+                Write-Host $_.Exception.Message
+            }
         }
     } else {
         $rproj_count += 1
