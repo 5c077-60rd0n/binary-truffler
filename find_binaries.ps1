@@ -1,5 +1,11 @@
 $tfExePath = "C:\Program Files\Microsoft Visual Studio\2022\TeamExplorer\Common7\IDE\CommonExtensions\Microsoft\TeamFoundation\Team Explorer\tf.exe"
 
+# Check if tf.exe is accessible
+if (-Not (Test-Path $tfExePath)) {
+    Write-Host "tf.exe not found at path: $tfExePath" -ForegroundColor Red
+    exit 1
+}
+
 function Get-FileSize {
     param (
         [string]$itemfullpath
@@ -189,6 +195,7 @@ foreach ($item in $items) {
             try {
                 Write-Host "Processing project: $($item.name)"
                 $folders = & $tfExePath dir "$/$($item.name)" /recursive
+                Write-Host "Folders retrieved for project: $($item.name)"
                 $global:projectname = $($item.name)
                 Get-ProjectFolderFileSize -folders $folders
                 $binariesList += Get-ProjectFolderBinaries -folders $folders
