@@ -203,7 +203,7 @@ foreach ($item in $items) {
                 Write-Host "Command output: $output"
                 Write-Host "Command error: $error"
                 if ($process.ExitCode -ne 0) {
-                    throw "TF.exe command failed with exit code $($process.ExitCode)"
+                    throw "TF.exe command failed with exit code $($process.ExitCode). Error: $error"
                 }
                 Write-Host "Folders retrieved for project: $($item.name)"
                 $global:projectname = $($item.name)
@@ -214,6 +214,7 @@ foreach ($item in $items) {
             } catch {
                 Write-Host "Failed to retrieve folders for project: $($item.name)" -ForegroundColor Red
                 Write-Host $_.Exception.Message
+                Write-Host "Error details: $error"
             }
         }
     } else {
