@@ -61,11 +61,11 @@ Creates a spreadsheet listing all binaries and saves it to the specified path.
 ### Requirements
 
 - PowerShell 5.1 or later
-- `Az.DevOps` module
+- `AzureDevOps` module
 
 You can install the required module using the following command:
 ```powershell
-Install-Module -Name Az.DevOps -Scope CurrentUser -Force
+Install-Module -Name AzureDevOps -Scope CurrentUser -Force
 ```
 
 ### Usage
@@ -81,6 +81,40 @@ To run the script, use the following command:
 ```
 
 Replace `<USERNAME>`, `<PAT>`, `<TFS_URL>`, `<PROJECT>`, `<REPO>`, and `<OUTPUT_PATH>` with your TFS username, personal access token, TFS URL, project name, repository name, and the path to save the output spreadsheet, respectively.
+
+### Logging
+
+The script provides feedback on its progress and any issues encountered through console output.
+
+### Spreadsheet Format
+
+The output spreadsheet will be in `.xlsx` format and will contain the following columns:
+- **File Path**: The path to the binary file.
+- **File Size**: The size of the binary file in bytes.
+- **Ignored**: Whether the file is ignored by `.gitignore`, `.tfignore`, or `.tfattributes`.
+
+## PowerShell Script for Finding Binaries
+
+`find_binaries.ps1` is a PowerShell script that evaluates files in TFS projects, identifies binaries, and lists them in a spreadsheet.
+
+### Requirements
+
+- PowerShell 5.1 or later
+- `TF.exe` (Team Foundation Version Control command-line tool)
+
+### Usage
+
+To run the script, use the following command:
+```powershell
+.\find_binaries.ps1 -tfsUrl <TFS_URL> -outputPath <OUTPUT_PATH>
+```
+
+### Example
+```powershell
+.\find_binaries.ps1 -tfsUrl "https://your-tfs-url/tfs/YourCollection" -outputPath "C:\path\to\output.xlsx"
+```
+
+Replace `<TFS_URL>` and `<OUTPUT_PATH>` with your TFS URL and the path to save the output spreadsheet, respectively.
 
 ### Logging
 

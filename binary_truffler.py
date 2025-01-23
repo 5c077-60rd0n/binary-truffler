@@ -49,7 +49,6 @@ def unzip_repo(zip_path, extract_to):
                     logging.info(f"Unzipped {i}/{total_files} files")
     logging.info(f"Unzipped repository to {extract_to}")
 
-# Function to get the list of files in a directory
 def get_files_list(directory):
     """Get the list of files in a directory."""
     files_list = []
@@ -59,7 +58,6 @@ def get_files_list(directory):
             files_list.extend([future.result() for future in concurrent.futures.as_completed(futures)])
     return files_list
 
-# Function to get the list of directories in a directory
 def get_directories_list(directory):
     """Get the list of directories in a directory."""
     directories_list = []
@@ -69,7 +67,6 @@ def get_directories_list(directory):
             directories_list.extend([future.result() for future in concurrent.futures.as_completed(futures)])
     return directories_list
 
-# Function to get the list of binaries in a directory
 def get_binaries_list(directory):
     """Get the list of binaries in a directory."""
     binaries_list = []
