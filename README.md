@@ -101,6 +101,10 @@ The output spreadsheet will be in `.xlsx` format and will contain the following 
 
 - PowerShell 5.1 or later
 - `TF.exe` (Team Foundation Version Control command-line tool)
+- **Team Explorer 2019**: This version is compatible with Visual Studio 2019 and includes the `tf.exe` tool.
+
+You can download and install Team Explorer 2019 from the Visual Studio website:
+- [Download Team Explorer 2019](https://visualstudio.microsoft.com/vs/older-downloads/)
 
 ### Usage
 
@@ -126,3 +130,8 @@ The output spreadsheet will be in `.xlsx` format and will contain the following 
 - **File Path**: The path to the binary file.
 - **File Size**: The size of the binary file in bytes.
 - **Ignored**: Whether the file is ignored by `.gitignore`, `.tfignore`, or `.tfattributes`.
+
+### Additional Notes
+
+- Ensure that `tf.exe` is accessible in your system's PATH or specify the full path to `tf.exe` in the script if it is not in the default location.
+- If you are using Visual Studio Code (VSCode) exclusively, you will still need to have `tf.exe` available on your system to run the `find_binaries.ps1` script.

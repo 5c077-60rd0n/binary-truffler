@@ -1,10 +1,12 @@
+$tfExePath = "C:\Program Files (x86)\Microsoft Visual Studio\2019\TeamExplorer\Common7\IDE\CommonExtensions\Microsoft\TeamFoundation\Team Explorer\tf.exe"
+
 function Get-FileSize {
     param (
         [string]$itemfullpath
     )
     Write-Verbose "Evaluating: $itemfullpath" -Verbose
     # Check if file exceeds 100 MB
-    $rslt = & .\tf.exe info "$itemfullpath" | Select-String -Pattern "size"
+    $rslt = & $tfExePath info "$itemfullpath" | Select-String -Pattern "size"
     if ([int64]$rslt.Line.Split(':')[1] -gt 100000000) {
         Write-Host "File: $itemfullpath exceeds 100 MB" -ForegroundColor Red
         $filenameCountExceed100MB += 1
@@ -184,7 +186,7 @@ foreach ($item in $items) {
             Write-Output "$($item.name)`tskipped" | Tee-Object -FilePath "C:\temp\TFVCProjects.txt" -Append
             $rproj_count += 1
         } else {
-            $folders = & .\TF.exe dir "$/$($item.name)" /recursive
+            $folders = & $tfExePath dir "$/$($item.name)" /recursive
             $global:projectname = $($item.name)
             Get-ProjectFolderFileSize -folders $folders
             $binariesList += Get-ProjectFolderBinaries -folders $folders
