@@ -1,6 +1,5 @@
 param (
     [string]$tfsUrl,
-    [string]$pat,
     [string]$outputPath
 )
 
@@ -23,7 +22,7 @@ try {
 
 # Check network connectivity to TFS server
 try {
-    $response = Invoke-WebRequest -Uri $tfsUrl -UseBasicParsing -TimeoutSec 10
+    $response = Invoke-WebRequest -Uri $tfsUrl -UseDefaultCredentials -TimeoutSec 10
     if ($response.StatusCode -ne 200) {
         throw "Unable to reach TFS server. Status code: $($response.StatusCode)"
     }
@@ -32,11 +31,6 @@ try {
     Write-Host "Failed to connect to TFS server. Please check your network connection and TFS URL."
     Write-Host $_.Exception.Message
     exit 1
-}
-
-# Set up authentication header
-$headers = @{
-    Authorization = "Basic " + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(":$pat"))
 }
 
 function Get-FileSize {
@@ -213,7 +207,7 @@ $excludeProj = @(
     "Project3"
 )
 
-$project = Invoke-RestMethod -Uri "$tfsUrl/_apis/projects?api-version=1.0&%24top=500" -Headers $headers
+$project = Invoke-RestMethod -Uri "$tfsUrl/_apis/projects?api-version=1.0&%24top=500" -UseDefaultCredentials
 $items = $project.value | Select-Object -Property name, description | Sort-Object name
 $binariesList = @()
 foreach ($item in $items) {
