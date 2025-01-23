@@ -6,6 +6,29 @@ if (-Not (Test-Path $tfExePath)) {
     exit 1
 }
 
+# Ensure tf.exe is authenticated
+try {
+    $authCheck = & $tfExePath workspaces
+    Write-Host "tf.exe is authenticated and working."
+} catch {
+    Write-Host "tf.exe is not authenticated. Please ensure it is authenticated with the TFS server."
+    exit 1
+}
+
+# Check network connectivity to TFS server
+$tfsUrl = "https://your-tfs-url/tfs/YourCollection"
+try {
+    $response = Invoke-WebRequest -Uri $tfsUrl -UseBasicParsing -TimeoutSec 10
+    if ($response.StatusCode -ne 200) {
+        throw "Unable to reach TFS server. Status code: $($response.StatusCode)"
+    }
+    Write-Host "Successfully connected to TFS server."
+} catch {
+    Write-Host "Failed to connect to TFS server. Please check your network connection and TFS URL."
+    Write-Host $_.Exception.Message
+    exit 1
+}
+
 function Get-FileSize {
     param (
         [string]$itemfullpath
@@ -194,27 +217,19 @@ foreach ($item in $items) {
         } else {
             try {
                 Write-Host "Processing project: $($item.name)"
-                $command = "$tfExePath dir `"$/$($item.name)`" /recursive"
-                Write-Host "Executing command: $command"
-                $process = Start-Process -FilePath $tfExePath -ArgumentList "dir `"$/$($item.name)`" /recursive" -NoNewWindow -RedirectStandardOutput "C:\temp\output.txt" -RedirectStandardError "C:\temp\error.txt" -PassThru
-                $process.WaitForExit()
-                $output = Get-Content "C:\temp\output.txt"
-                $error = Get-Content "C:\temp\error.txt"
-                Write-Host "Command output: $output"
-                Write-Host "Command error: $error"
-                if ($process.ExitCode -ne 0) {
-                    throw "TF.exe command failed with exit code $($process.ExitCode). Error: $error"
+                $folders = & $tfExePath dir "$/$($item.name)" /recursive
+                if ($folders -eq $null -or $folders.Count -eq 0) {
+                    throw "No folders retrieved for project: $($item.name)"
                 }
                 Write-Host "Folders retrieved for project: $($item.name)"
                 $global:projectname = $($item.name)
-                Get-ProjectFolderFileSize -folders $output
-                $binariesList += Get-ProjectFolderBinaries -folders $output
-                Write-Output "$($item.name)`t$($output.Count)" | Tee-Object -FilePath "C:\temp\TFVCProjects.txt" -Append
+                Get-ProjectFolderFileSize -folders $folders
+                $binariesList += Get-ProjectFolderBinaries -folders $folders
+                Write-Output "$($item.name)`t$($folders.Count)" | Tee-Object -FilePath "C:\temp\TFVCProjects.txt" -Append
                 $aproj_count += 1
             } catch {
                 Write-Host "Failed to retrieve folders for project: $($item.name)" -ForegroundColor Red
                 Write-Host $_.Exception.Message
-                Write-Host "Error details: $error"
             }
         }
     } else {
