@@ -194,7 +194,10 @@ foreach ($item in $items) {
         } else {
             try {
                 Write-Host "Processing project: $($item.name)"
+                $command = "$tfExePath dir `"$/$($item.name)`" /recursive"
+                Write-Host "Executing command: $command"
                 $folders = & $tfExePath dir "$/$($item.name)" /recursive
+                Write-Host "Command output: $folders"
                 Write-Host "Folders retrieved for project: $($item.name)"
                 $global:projectname = $($item.name)
                 Get-ProjectFolderFileSize -folders $folders
