@@ -1,3 +1,9 @@
+param (
+    [string]$tfsUrl,
+    [string]$pat,
+    [string]$outputPath
+)
+
 $tfExePath = "C:\Program Files\Microsoft Visual Studio\2022\TeamExplorer\Common7\IDE\CommonExtensions\Microsoft\TeamFoundation\Team Explorer\TF.exe"
 
 # Check if TF.exe is accessible
@@ -16,7 +22,6 @@ try {
 }
 
 # Check network connectivity to TFS server
-$tfsUrl = "https://your-tfs-url/tfs/YourCollection"
 try {
     $response = Invoke-WebRequest -Uri $tfsUrl -UseBasicParsing -TimeoutSec 10
     if ($response.StatusCode -ne 200) {
@@ -27,6 +32,11 @@ try {
     Write-Host "Failed to connect to TFS server. Please check your network connection and TFS URL."
     Write-Host $_.Exception.Message
     exit 1
+}
+
+# Set up authentication header
+$headers = @{
+    Authorization = "Basic " + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(":$pat"))
 }
 
 function Get-FileSize {
@@ -203,10 +213,7 @@ $excludeProj = @(
     "Project3"
 )
 
-# Replace with your TFS API URL
-$apiUrl = "https://your-tfs-url/tfs/YourCollection/_apis/projects?api-version=1.0&%24top=500"
-
-$project = Invoke-RestMethod -Uri $apiUrl -UseDefaultCredentials
+$project = Invoke-RestMethod -Uri "$tfsUrl/_apis/projects?api-version=1.0&%24top=500" -Headers $headers
 $items = $project.value | Select-Object -Property name, description | Sort-Object name
 $binariesList = @()
 foreach ($item in $items) {
@@ -241,7 +248,7 @@ foreach ($item in $items) {
 
 # Save the spreadsheet to the current workspace directory
 $currentWorkspace = (Get-Location).Path
-$outputPath = Join-Path -Path $currentWorkspace -ChildPath "output.xlsx"
+$outputPath = Join-Path -Path $currentWorkspace -ChildPath $outputPath
 
 Create-Spreadsheet -binariesList $binariesList -outputPath $outputPath
 
