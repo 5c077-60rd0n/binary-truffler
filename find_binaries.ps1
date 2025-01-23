@@ -1,8 +1,8 @@
-$tfExePath = "C:\Program Files\Microsoft Visual Studio\2022\TeamExplorer\Common7\IDE\CommonExtensions\Microsoft\TeamFoundation\Team Explorer\tf.exe"
+$tfExePath = "C:\Program Files\Microsoft Visual Studio\2022\TeamExplorer\Common7\IDE\CommonExtensions\Microsoft\TeamFoundation\Team Explorer\TF.exe"
 
-# Check if tf.exe is accessible
+# Check if TF.exe is accessible
 if (-Not (Test-Path $tfExePath)) {
-    Write-Host "tf.exe not found at path: $tfExePath" -ForegroundColor Red
+    Write-Host "TF.exe not found at path: $tfExePath" -ForegroundColor Red
     exit 1
 }
 
@@ -196,13 +196,20 @@ foreach ($item in $items) {
                 Write-Host "Processing project: $($item.name)"
                 $command = "$tfExePath dir `"$/$($item.name)`" /recursive"
                 Write-Host "Executing command: $command"
-                $folders = & $tfExePath dir "$/$($item.name)" /recursive
-                Write-Host "Command output: $folders"
+                $process = Start-Process -FilePath $tfExePath -ArgumentList "dir `"$/$($item.name)`" /recursive" -NoNewWindow -RedirectStandardOutput "C:\temp\output.txt" -RedirectStandardError "C:\temp\error.txt" -PassThru
+                $process.WaitForExit()
+                $output = Get-Content "C:\temp\output.txt"
+                $error = Get-Content "C:\temp\error.txt"
+                Write-Host "Command output: $output"
+                Write-Host "Command error: $error"
+                if ($process.ExitCode -ne 0) {
+                    throw "TF.exe command failed with exit code $($process.ExitCode)"
+                }
                 Write-Host "Folders retrieved for project: $($item.name)"
                 $global:projectname = $($item.name)
-                Get-ProjectFolderFileSize -folders $folders
-                $binariesList += Get-ProjectFolderBinaries -folders $folders
-                Write-Output "$($item.name)`t$($folders.count)" | Tee-Object -FilePath "C:\temp\TFVCProjects.txt" -Append
+                Get-ProjectFolderFileSize -folders $output
+                $binariesList += Get-ProjectFolderBinaries -folders $output
+                Write-Output "$($item.name)`t$($output.Count)" | Tee-Object -FilePath "C:\temp\TFVCProjects.txt" -Append
                 $aproj_count += 1
             } catch {
                 Write-Host "Failed to retrieve folders for project: $($item.name)" -ForegroundColor Red
