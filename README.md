@@ -110,15 +110,15 @@ You can download and install Team Explorer 2022 from the Visual Studio website:
 
 To run the script, use the following command:
 ```powershell
-.\find_binaries.ps1 -tfsUrl <TFS_URL> -outputPath <OUTPUT_PATH>
+.\find_binaries.ps1 -tfsUrl <TFS_URL> -pat <PAT> -outputPath <OUTPUT_PATH>
 ```
 
 ### Example
 ```powershell
-.\find_binaries.ps1 -tfsUrl "https://your-tfs-url/tfs/YourCollection" -outputPath "C:\path\to\output.xlsx"
+.\find_binaries.ps1 -tfsUrl "https://your-tfs-url/tfs/YourCollection" -pat "yourPAT" -outputPath "C:\path\to\output.xlsx"
 ```
 
-Replace `<TFS_URL>` and `<OUTPUT_PATH>` with your TFS URL and the path to save the output spreadsheet, respectively.
+Replace `<TFS_URL>`, `<PAT>`, and `<OUTPUT_PATH>` with your TFS URL, personal access token, and the path to save the output spreadsheet, respectively.
 
 ### Logging
 
