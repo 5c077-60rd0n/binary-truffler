@@ -101,10 +101,10 @@ The output spreadsheet will be in `.xlsx` format and will contain the following 
 
 - PowerShell 5.1 or later
 - `TF.exe` (Team Foundation Version Control command-line tool)
-- **Team Explorer 2019**: This version is compatible with Visual Studio 2019 and includes the `tf.exe` tool.
+- **Team Explorer 2022**: This version is compatible with Visual Studio 2022 and includes the `tf.exe` tool.
 
-You can download and install Team Explorer 2019 from the Visual Studio website:
-- [Download Team Explorer 2019](https://visualstudio.microsoft.com/vs/older-downloads/)
+You can download and install Team Explorer 2022 from the Visual Studio website:
+- [Download Team Explorer 2022](https://visualstudio.microsoft.com/vs/older-downloads/)
 
 ### Usage
 
