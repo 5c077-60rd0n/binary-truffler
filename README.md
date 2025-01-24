@@ -54,84 +54,32 @@ Returns a list of all binaries in the specified directory.
 ### `create_spreadsheet(binaries_list, output_path)`
 Creates a spreadsheet listing all binaries and saves it to the specified path.
 
-## PowerShell Script
+### `is_binary(file_path)`
+Determines if a file is binary.
 
-`tfs_truffler.ps1` is a PowerShell script that authenticates a user with TFS using a username and PAT, downloads the repository, and lists all binaries in a spreadsheet.
+### `is_ignored(file_path)`
+Determines if a file is ignored by `.gitignore`, `.tfignore`, or `.tfattributes`.
 
-### Requirements
+### `clean_up(directory)`
+Removes the extracted files and directories.
 
-- PowerShell 5.1 or later
-- `AzureDevOps` module
+## Example Workflow
 
-You can install the required module using the following command:
-```powershell
-Install-Module -Name AzureDevOps -Scope CurrentUser -Force
-```
+1. **Unzip the Repository**:
+   ```sh
+   python binary_truffler.py --zip_path path/to/repo.zip --extract_to path/to/extract --output_path path/to/output.xlsx
+   ```
 
-### Usage
+2. **Get the List of Binaries**:
+   The script will automatically get the list of binaries from the extracted repository.
 
-To run the script, use the following command:
-```powershell
-.\tfs_truffler.ps1 -username <USERNAME> -pat <PAT> -tfsUrl <TFS_URL> -project <PROJECT> -repo <REPO> -outputPath <OUTPUT_PATH>
-```
+3. **Create the Spreadsheet**:
+   The script will create a spreadsheet listing all binaries and save it to the specified path.
 
-### Example
-```powershell
-.\tfs_truffler.ps1 -username "user@example.com" -pat "yourPAT" -tfsUrl "https://dev.azure.com/yourorganization" -project "YourProject" -repo "YourRepo" -outputPath "C:\path\to\output.xlsx"
-```
+4. **Clean Up**:
+   The script will clean up the extracted files and directories.
 
-Replace `<USERNAME>`, `<PAT>`, `<TFS_URL>`, `<PROJECT>`, `<REPO>`, and `<OUTPUT_PATH>` with your TFS username, personal access token, TFS URL, project name, repository name, and the path to save the output spreadsheet, respectively.
+## Additional Notes
 
-### Logging
-
-The script provides feedback on its progress and any issues encountered through console output.
-
-### Spreadsheet Format
-
-The output spreadsheet will be in `.xlsx` format and will contain the following columns:
-- **File Path**: The path to the binary file.
-- **File Size**: The size of the binary file in bytes.
-- **Ignored**: Whether the file is ignored by `.gitignore`, `.tfignore`, or `.tfattributes`.
-
-## PowerShell Script for Finding Binaries
-
-`find_binaries.ps1` is a PowerShell script that evaluates files in TFS projects, identifies binaries, and lists them in a spreadsheet.
-
-### Requirements
-
-- PowerShell 5.1 or later
-- `TF.exe` (Team Foundation Version Control command-line tool)
-- **Team Explorer 2022**: This version is compatible with Visual Studio 2022 and includes the `tf.exe` tool.
-
-You can download and install Team Explorer 2022 from the Visual Studio website:
-- [Download Team Explorer 2022](https://visualstudio.microsoft.com/vs/older-downloads/)
-
-### Usage
-
-To run the script, use the following command:
-```powershell
-.\find_binaries.ps1 -tfsUrl <TFS_URL> -outputPath <OUTPUT_PATH>
-```
-
-### Example
-```powershell
-.\find_binaries.ps1 -tfsUrl "https://your-tfs-url/tfs/YourCollection" -outputPath "C:\path\to\output.xlsx"
-```
-
-Replace `<TFS_URL>` and `<OUTPUT_PATH>` with your TFS URL and the path to save the output spreadsheet, respectively.
-
-### Logging
-
-The script provides feedback on its progress and any issues encountered through console output.
-
-### Spreadsheet Format
-
-The output spreadsheet will be in `.xlsx` format and will contain the following columns:
-- **File Path**: The path to the binary file.
-- **File Size**: The size of the binary file in bytes.
-- **Ignored**: Whether the file is ignored by `.gitignore`, `.tfignore`, or `.tfattributes`.
-
-### Additional Notes
-
-- Ensure that `tf.exe` is accessible in your system's PATH or specify the full path to `tf.exe` in the script if it is not in the default location.
-- If you are using Visual Studio Code (VSCode) exclusively, you will still need to have `tf.exe` available on your system to run the `find_binaries.ps1` script.
+- Ensure that the `openpyxl` library is installed before running the script.
+- The script uses concurrent processing to speed up file operations.
