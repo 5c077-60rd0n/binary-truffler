@@ -92,12 +92,27 @@ def create_spreadsheet(binaries_list, output_path):
     logging.info(f"Spreadsheet saved to {output_path}")
 
 def is_binary(file_path):
-    # Implement logic to determine if a file is binary
-    pass
+    """Determine if a file is binary."""
+    try:
+        with open(file_path, 'rb') as file:
+            for byte in file.read(1024):
+                if byte > 127:
+                    return file_path
+    except Exception as e:
+        logging.error(f"Error reading file {file_path}: {e}")
+    return None
 
 def is_ignored(file_path):
-    # Implement logic to determine if a file is ignored
-    pass
+    """Determine if a file is ignored by .gitignore, .tfignore, or .tfattributes."""
+    ignore_files = ['.gitignore', '.tfignore', '.tfattributes']
+    for ignore_file in ignore_files:
+        if os.path.exists(ignore_file):
+            with open(ignore_file, 'r') as f:
+                patterns = f.read().splitlines()
+                for pattern in patterns:
+                    if file_path.endswith(pattern):
+                        return True
+    return False
 
 def clean_up(directory):
     """Remove the extracted files and directories."""
