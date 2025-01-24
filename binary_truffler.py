@@ -116,6 +116,9 @@ def is_ignored(file_path):
 
 def clean_up(directory):
     """Remove the extracted files and directories."""
+    if directory in [".", "/", os.path.abspath(os.sep)]:
+        logging.error(f"Refusing to delete the directory: {directory}")
+        return
     shutil.rmtree(directory)
     logging.info(f"Cleaned up extracted files from {directory}")
 
